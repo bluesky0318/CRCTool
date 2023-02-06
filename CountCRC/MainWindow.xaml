@@ -1,0 +1,175 @@
+﻿<Window x:Class="CountCRC.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountCRC"
+        mc:Ignorable="d"
+        Title="CRCToolV0.1" Height="600" Width="800" FontFamily="Arial" FontSize="14" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="45"></Setter>
+            <Setter Property="Height" Value="20"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <!--定义视觉树-->
+                        <Border x:Name="border" BorderThickness="1.5" CornerRadius="9" BorderBrush="#aaa" Background="#2790ff">
+                            <Grid x:Name="togglebutton" HorizontalAlignment="Right" >
+                                <Border Width="17" Height="17" CornerRadius="9" Background="White"/>
+                            </Grid>
+                            <!--阴影设置-->
+                            <Border.Effect>
+                                <DropShadowEffect Color="Gray" BlurRadius="5" ShadowDepth="0" Opacity="0.5" />
+                            </Border.Effect>
+                        </Border>
+                        <!--定义触发器-->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="border" Property="Background" Value="#ccc"/>
+                                <Setter TargetName="togglebutton" Property="HorizontalAlignment" Value="Left"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*"  />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="120" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Label Content="输入内容/加载文件" Grid.Column="0" VerticalAlignment="Center"/>
+            <Label x:Name="filePathLabel" Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="2"/>
+            <Button Content="加载文件" Grid.Column="2" Width="68" Height="28" HorizontalAlignment="Center" Click="loadBtn_Click"/>
+        </Grid>
+        <Border Margin="5" Grid.Row="1" BorderBrush="Black"  BorderThickness="1">
+            <RichTextBox x:Name="richTextBox" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Border>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Label Content="内容格式:" Margin="2" Grid.Column="0"/>
+            <ComboBox Grid.Column="1" Margin="2" SelectedIndex="0">
+                <ComboBoxItem Content="Hex" />
+            </ComboBox>
+            <Label Content="算法选择" Margin="2" Grid.Column="2"/>
+            <ComboBox Grid.Column="3" Margin="2" x:Name="crcAlgorithmCB" ItemsSource="{Binding algorithm_Collection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                      SelectionChanged="crcAlgorithmCB_SelectionChanged" SelectedIndex="{Binding algorithm_Index, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            <Button Content="计  算" Grid.Column="4" Width="58" Height="28" HorizontalAlignment="Center" Click="countBtn_Click"/>
+            <Button Content="清  空" Grid.Column="5" Width="58" Height="28" HorizontalAlignment="Center" Click="clearBtn_Click"/>
+        </Grid>
+        <DockPanel Grid.Row="3"  LastChildFill="True">
+            <Label Content="多项式公式:" Margin="2" DockPanel.Dock="Left" />
+            <Label BorderBrush="Black" BorderThickness="1" Margin="2,2,10,2" Content="{Binding algorithm_Polynomial,Mode=OneWay}"/>
+        </DockPanel>
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Label Content="宽度位数：" Grid.Column="0"/>
+            <Label Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="2" Content="{Binding algorithm_Width,Mode=OneWay}"/>
+            <Label Content="多项式POLY(HEX)：" Grid.Column="2"/>
+            <Label Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="2" Content="{Binding algorithm_Poly,Mode=OneWay}"/>
+        </Grid>
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <Label Content="初始值INIT(HEX)：" Grid.Column="0"/>
+            <Label Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="2" Content="{Binding algorithm_InitValue,Mode=OneWay}"/>
+            <Label Content="结果异或值XOROUT(HEX)：" Grid.Column="2"/>
+            <Label Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="2" Content="{Binding algorithm_XOROUT,Mode=OneWay}"/>
+        </Grid>
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="220" />
+            </Grid.ColumnDefinitions>
+            <Label Content="数据反转" Grid.Column="0"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="1">
+                <Label Content="输入反转(REFIN)" />
+                <ToggleButton Style="{StaticResource ToggleButtonStyle}" IsChecked="{Binding reversalInBtnIsCheck}" Click="inToggleButton_Click"/>
+                <Label Content="{Binding inToggleStatus}" Margin="10,2,2,2"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="2">
+                <Label Content="输出反转(REFOUT)" />
+                <ToggleButton Style="{StaticResource ToggleButtonStyle}" IsChecked="{Binding reversalOutBtnIsCheck}" Click="outToggleButton_Click"/>
+                <Label Content="{Binding outToggleStatus}" Margin="10,2,2,2"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="160" />
+            </Grid.ColumnDefinitions>
+            <Label Content="计算结果(HEX)：" Grid.Column="0"/>
+            <Label Grid.Column="1" x:Name="hexResultLab" BorderBrush="Black" BorderThickness="1" Margin="2"/>
+            <Button Content="复  制" Grid.Column="6" Width="58" Height="28" HorizontalAlignment="Center" Click="hexResultCopyBtn_Click"/>
+        </Grid>
+        <Grid Grid.Row="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="160" />
+            </Grid.ColumnDefinitions>
+            <Label Content="计算结果(Bin)：" Grid.Column="0"/>
+            <Label Grid.Column="1" x:Name="binResultLab" BorderBrush="Black" BorderThickness="1" Margin="2"/>
+            <Button Content="复  制" Grid.Column="6" Width="58" Height="28" HorizontalAlignment="Center" Click="binResultCopyBtn_Click"/>
+        </Grid>
+        <Border Margin="5" Grid.Row="9" BorderBrush="Black"  BorderThickness="1">
+            <RichTextBox VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True">
+                <RichTextBox.Resources>
+                    <Style TargetType="{x:Type Paragraph}">
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </RichTextBox.Resources>
+                <FlowDocument>
+                    <Paragraph>
+                        <TextBlock Foreground="Red" FontWeight="Bold" Text="{Binding algorithm_Summary,StringFormat=CRC校验（循环冗余校验）: {0}}" />
+                    </Paragraph>
+                    <Paragraph>CRC即循环冗余校验码（Cyclic Redundancy Check）：是数据通信领域中最常用的一种查错校验码，其特征是信息字段和校验字段的长度可以任意选定。循环冗余检查（CRC）是一种数据传输检错功能，对数据进行多项式计算，并将得到的结果附在帧的后面，接收设备也执行类似的算法，以保证数据传输的正确性和完整性。
+                    </Paragraph>
+                    <Paragraph>CRC算法参数模型解释：</Paragraph>
+                    <Paragraph>NAME：参数模型名称。</Paragraph>
+                    <Paragraph>WIDTH：宽度，即CRC比特数。</Paragraph>
+                    <Paragraph>POLY：生成项的简写，以16进制表示。例如：CRC-32即是0x04C11DB7，忽略了最高位的"1"，即完整的生成项是0x104C11DB7。</Paragraph>
+                    <Paragraph>INIT：这是算法开始时寄存器（crc）的初始化预置值，十六进制表示。</Paragraph>
+                    <Paragraph>REFIN：待测数据的每个字节是否按位反转，True或False。</Paragraph>
+                    <Paragraph>REFOUT：在计算后之后，异或输出之前，整个数据是否按位反转，True或False。</Paragraph>
+                    <Paragraph>XOROUT：计算结果与此参数异或后得到最终的CRC值。</Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+        </Border>
+    </Grid>
+</Window>
